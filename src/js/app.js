@@ -2,6 +2,7 @@ App = {
   web3Provider: null,
   contracts: {},
   account: '0x0',
+  flag: true,
 
   init: function() {
     return App.initWeb3();
@@ -22,11 +23,11 @@ App = {
   },
 
   initContract: function() {
-    $.getJSON("FIR.json", function(FIR) {
+    $.getJSON("PropertyRegistration.json", function(PropertyRegistration) {
       // Instantiate a new truffle contract from the artifact
-      App.contracts.FIR = TruffleContract(FIR);
+      App.contracts.PropertyRegistration = TruffleContract(PropertyRegistration);
       // Connect provider to interact with contract
-      App.contracts.FIR.setProvider(App.web3Provider);
+      App.contracts.PropertyRegistration.setProvider(App.web3Provider);
 
       App.listenForEvents();
 
@@ -35,23 +36,43 @@ App = {
   },
 
   listenForEvents: function() {
-    App.contracts.FIR.deployed().then(function(instance) {
-      // Restart Chrome if you are unable to receive this event
-      // This is a known issue with Metamask
-      // https://github.com/MetaMask/metamask-extension/issues/2393
-      instance.reportFiledEvent({}, {}).watch(function(error, event) {
-        alert("FIR is created with ID: " + event.args.reportID);
+    App.contracts.PropertyRegistration.deployed().then(function(instance) {
+
+      instance.successEvent({}, {fromBlock: 'latest', toBlock: 'latest'}).watch(function(error, event) {
+          if(App.flag) {
+            App.flag = false;
+            alert(event.args.message);
+          }
       });
+
+      instance.invalidEvent({}, {fromBlock: 'latest', toBlock: 'latest'}).watch(function(error, event) {
+          if(App.flag) {
+            App.flag = false;
+            alert(event.args.message);
+          }
+      });
+
+      instance.properyRegisteredEvent({}, {fromBlock: 'latest', toBlock: 'latest'}).watch(function(error, event) {
+          if(App.flag) {
+            App.flag = false;
+            alert("Successfully registerd the property, transaction ID: " + event.args.transactionID);
+          }
+      });
+
+      instance.properyTransferredEvent({}, {fromBlock: 'latest', toBlock: 'latest'}).watch(function(error, event) {
+          if(App.flag) {
+            App.flag = false;
+            alert("Successfully transferred the property, transaction ID: " + event.args.transactionID);
+          }
+      });
+
     });
   },
 
   render: function() {
 
     console.log("Render");
-    // $("fileFIRForm").hide();
-    // $("displayFIRForm").hide();    
 
-    // Load account data
     web3.eth.getCoinbase(function(err, account) {
       if (err === null) {
         App.account = account;
@@ -60,62 +81,149 @@ App = {
     });
   },
 
-  enableFileFIR : function() {
-    console.log("enableFileFIR");
-    var dFIR = $("#dFIR");
-    dFIR.empty();
-    var out = $("#out");
-    out.empty();
-    var fFIR = $("#fFIR");
-    fFIR.empty();
-    fFIR.append("<tr><td>" + "<input type=\"text\" placeholder=\"&emsp;Identity Proof\" id=\"fID\"/>" + "</td></tr>");
-    fFIR.append("<tr><td>" + "<input type=\"text\" placeholder=\"&emsp;Name\" id=\"fName\"/>" + "</td></tr>");
-    fFIR.append("<tr><td>" + "<input type=\"text\" placeholder=\"&emsp;Phone\" id=\"fPhone\"/>" + "</td></tr>");
-    fFIR.append("<tr><td>" + "<textarea rows=\"12\" cols=\"70\" placeholder=\"   Report\" id=\"fReport\"></textarea>" + "</td></tr>");
-    fFIR.append("<tr><td>" + "<button type=\"button\" class=\"btn btn-primary\" onClick=\"App.fileFIR();\">Submit</button>" + "</td></tr>");
+  enableRegisterUser : function() {
+    console.log("enableRegisterUser");
+    App.flag = true;
+    var rU = $("#rU");  rU.empty();
+    var rP = $("#rP");  rP.empty();
+    var tP = $("#tP");  tP.empty();
+    var dP = $("#dP");  dP.empty();
+    var out = $("#out"); out.empty();
+    var out2 = $("#out2"); out2.empty();
+
+    rU.append("<tr><td>" + "<input type=\"text\" placeholder=\"&emsp;Identity Proof\" id=\"rUID\"/>" + "</td></tr>");
+    rU.append("<tr><td>" + "<input type=\"text\" placeholder=\"&emsp;Name\" id=\"rUName\"/>" + "</td></tr>");
+    rU.append("<tr><td>" + "<input type=\"password\" placeholder=\"&emsp;Password\" id=\"rUPassword\"/>" + "</td></tr>");
+    rU.append("<tr><td>" + "<button type=\"button\" class=\"btn btn-primary\" onClick=\"App.registerUser();\">Submit</button>" + "</td></tr>");
   },
 
-  enableGetFIR : function() {
-    console.log("enableGetFIR");
-    var fFIR = $("#fFIR");
-    fFIR.empty();
-    var dFIR = $("#dFIR");
-    dFIR.empty();
-    dFIR.append("<tr><td>" + "<input type=\"text\" placeholder=\"&emsp;FIR ID\" id=\"dID\"/><button type=\"text\" class=\"btn btn-primary\" onClick=\"App.getFIR();\">Submit</button>" + "</td></tr>");
+  enableRegisterProperty : function() {
+    console.log("enableRegisterProperty");
+    App.flag = true;
+    var rU = $("#rU");  rU.empty();
+    var rP = $("#rP");  rP.empty();
+    var tP = $("#tP");  tP.empty();
+    var dP = $("#dP");  dP.empty();
+    var out = $("#out"); out.empty();
+    var out2 = $("#out2"); out2.empty();
+
+    rP.append("<tr><td>" + "<input type=\"text\" placeholder=\"&emsp;Owner ID\" id=\"rPOID\"/>" + "</td></tr>");
+    rP.append("<tr><td>" + "<input type=\"text\" placeholder=\"&emsp;Owner Name\" id=\"rPOName\"/>" + "</td></tr>");
+    rP.append("<tr><td>" + "<input type=\"password\" placeholder=\"&emsp;Password\" id=\"rPOPassword\"/>" + "</td></tr>");
+    rP.append("<tr><td>" + "<input type=\"text\" placeholder=\"&emsp;Property ID\" id=\"rPPID\"/>" + "</td></tr>");
+    rP.append("<tr><td>" + "<input type=\"text\" placeholder=\"&emsp;Property Type\" id=\"rPPType\"/>" + "</td></tr>");
+    rP.append("<tr><td>" + "<input type=\"text\" placeholder=\"&emsp;Property Address\" id=\"rPPAddress\"/>" + "</td></tr>");
+    rP.append("<tr><td>" + "<input type=\"text\" placeholder=\"&emsp;Property Dimensions\" id=\"rPPDimens\"/>" + "</td></tr>");
+    rP.append("<tr><td>" + "<button type=\"button\" class=\"btn btn-primary\" onClick=\"App.registerProperty();\">Submit</button>" + "</td></tr>");
   },
 
-  fileFIR : function() {
-    var ID = parseInt(document.getElementById("fID").value);
-    var name = document.getElementById("fName").value;
-    var phone = document.getElementById("fPhone").value;
-    var report = document.getElementById("fReport").value;
-    document.getElementById("fForm").reset();
-    App.contracts.FIR.deployed().then(function(instance) {
-      return instance.fileFIR(ID, name, phone, report, new Date().toString(), { from: App.account })
+  enableTransferProperty : function() {
+    console.log("enableRegisterProperty");
+    App.flag = true;
+    var rU = $("#rU");  rU.empty();
+    var rP = $("#rP");  rP.empty();
+    var tP = $("#tP");  tP.empty();
+    var dP = $("#dP");  dP.empty();
+    var out = $("#out"); out.empty();
+    var out2 = $("#out2"); out2.empty();
+
+    tP.append("<tr><td>" + "<input type=\"text\" placeholder=\"&emsp;Property ID\" id=\"tPPID\"/>" + "</td></tr>");
+    tP.append("<tr><td>" + "<input type=\"text\" placeholder=\"&emsp;Seller ID\" id=\"tPSID\"/>" + "</td></tr>");
+    tP.append("<tr><td>" + "<input type=\"text\" placeholder=\"&emsp;Seller Name\" id=\"tPSName\"/>" + "</td></tr>");
+    tP.append("<tr><td>" + "<input type=\"password\" placeholder=\"&emsp;Password\" id=\"tPSPassword\"/>" + "</td></tr>");
+    tP.append("<tr><td>" + "<input type=\"text\" placeholder=\"&emsp;Buyer ID\" id=\"tPBID\"/>" + "</td></tr>");
+    tP.append("<tr><td>" + "<input type=\"text\" placeholder=\"&emsp;Buyer Name\" id=\"tPBName\"/>" + "</td></tr>");
+    tP.append("<tr><td>" + "<input type=\"text\" placeholder=\"&emsp;Amount\" id=\"tPAmount\"/>" + "</td></tr>");
+    tP.append("<tr><td>" + "<button type=\"button\" class=\"btn btn-primary\" onClick=\"App.transferProperty();\">Submit</button>" + "</td></tr>");
+  },
+
+  enableSearchProperty : function() {
+    console.log("enableSearchProperty");
+    App.flag = true;
+    var rU = $("#rU");  rU.empty();
+    var rP = $("#rP");  rP.empty();
+    var tP = $("#tP");  tP.empty();
+    var dP = $("#dP");  dP.empty();
+    var out = $("#out"); out.empty();
+    var out2 = $("#out2"); out2.empty();
+
+    dP.append("<tr><td>" + "<input type=\"text\" placeholder=\"&emsp;Property ID\" id=\"dPID\"/><button type=\"text\" class=\"btn btn-primary\" onClick=\"App.getProperty();\">Submit</button>" + "</td></tr>");
+  },
+
+  registerUser : function() {
+    App.flag = true;
+    var ID = parseInt(document.getElementById("rUID").value);
+    var name = document.getElementById("rUName").value;
+    var password = document.getElementById("rUPassword").value;
+    App.contracts.PropertyRegistration.deployed().then(function(instance) {
+      return instance.registerUser(ID, name, password, { from: App.account });
     });
   },
 
-  getFIR : function() {
-    var reportID = document.getElementById("dID").value.split(".");
-    App.contracts.FIR.deployed().then(function(instance) {
-      return instance.getFIRByID(parseInt(reportID[0]), parseInt(reportID[1]), { from: App.account }).then( function(result) {
+  registerProperty : function() {
+    App.flag = true;
+    var oID = parseInt(document.getElementById("rPOID").value);
+    var oName = document.getElementById("rPOName").value;
+    var oPassword = document.getElementById("rPOPassword").value;
+    var pID = parseInt(document.getElementById("rPPID").value);
+    var pType = document.getElementById("rPPType").value;
+    var pAddress = document.getElementById("rPPAddress").value;
+    var pDimens = document.getElementById("rPPDimens").value;
+
+    App.contracts.PropertyRegistration.deployed().then(function(instance) {
+      return instance.registerProperty(oID, oName, oPassword, pID, pType, pDimens, pAddress, new Date().toString(), { from: App.account });
+    });
+  },
+
+  transferProperty : function() {
+    App.flag = true;
+    var pID = parseInt(document.getElementById("tPPID").value);
+    var sID = parseInt(document.getElementById("tPSID").value);
+    var sName = document.getElementById("tPSName").value;
+    var sPassword = document.getElementById("tPSPassword").value;
+    var bID = parseInt(document.getElementById("tPBID").value);
+    var bName = document.getElementById("tPBName").value;
+    var amount = parseInt(document.getElementById("tPAmount").value);
+    console.log(sPassword);
+    App.contracts.PropertyRegistration.deployed().then(function(instance) {
+      return instance.transferProperty(pID, sID, sName, sPassword, bID, bName, amount, new Date().toString(), { from: App.account });
+    });
+  },
+
+  getProperty : function() {
+    App.flag = true;
+    var propertyID = parseInt(document.getElementById("dPID").value);
+    App.contracts.PropertyRegistration.deployed().then(function(instance) {
+      return instance.getPropertyByID(propertyID,  { from: App.account }).then( function(result) {
         var out = $("#out");
         out.empty();
-        if(result[0]=="") {
-          alert("FIR not found");
+        if(result[0]==0) {
+          alert("Property not found");
           return;
         }
-        out.append("<tr><td>FIR ID: " + result[0] + "</td></tr>");
-        out.append("<tr><td>Name: " + result[2] + "</td></tr>");
-        out.append("<tr><td>ID: " + result[1].toNumber() + "</td></tr>");
-        out.append("<tr><td>Phone: " + result[3].toNumber() + "</td></tr>");
-        out.append("<tr><td>Time: " + result[5] + "</td></tr>");
-        out.append("<tr><td>Report: " + result[4] + "</td></tr>");
-        out.append("<tr><td>Officer: " + result[6] + "</td></tr>");
+        out.append("<tr><td>Property ID: " + result[0].toNumber() + "</td></tr>");
+        out.append("<tr><td>Property Type: " + result[1] + "</td></tr>");
+        out.append("<tr><td>Property Address: " + result[2] + "</td></tr>");
+        out.append("<tr><td>Property Dimensions: " + result[3] + "</td></tr>");
+        out.append("<tr><td>Owner ID: " + result[4].toNumber() + "</td></tr>");
+        out.append("<tr><td>Owner Name: " + result[5] + "</td></tr>");
+        out.append("<tr><td>Purchased: " + result[6] + "</td></tr>");
+
+        var prevOwnersCount = result[7].toNumber();
+        var out2 = $("#out2");
+        out2.empty();
+        out2.append("<caption>Previous Owners</caption>");
+        out2.append("<tbody>");
+        out2.append("<tr><th>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ID</th><th>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Name</th></tr>");
+        for(var i=0; i<prevOwnersCount; ++i) {
+          instance.getPrevOwner(propertyID, i,  { from: App.account }).then(function(result) {
+            out2.append("<tr><td>" + result[0] + "</td><td>" + result[1] + "</td></tr>");
+          })
+        }
+        out2.append("</tbody>");
       })
     });
   },
-
 };
 
 $(function() {

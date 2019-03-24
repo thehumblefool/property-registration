@@ -6,40 +6,65 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
-    <title>First Information Report</title>
+    <title>Property Registration</title>
 
     <!-- Bootstrap -->
     <link href="css/bootstrap.min.css" rel="stylesheet">
   </head>
 
-  <body>
+  <body align="center">
     <div class="container" style="width: 650px;">
 
       <div class="row">
 
         <div class="col-lg-12">
-          <h1 class="text-center">First Information Report</h1>
+          <h1 class="text-center">Property Registration</h1>
           <hr/>
           <br/>
           <center>
-            <button type="button" onClick="App.enableFileFIR();" align="middle" class="btn btn-primary"> File FIR </button>
-            <button type="button" onClick="App.enableGetFIR();" align="middle" class="btn btn-primary"> Search FIR </button>
+            <button type="button" onClick="App.enableRegisterUser();" class="btn btn-primary"> Register User </button>
+
+            <button type="button" onClick="App.enableRegisterProperty();" class="btn btn-primary"> Register Property </button>
+
+            <button type="button" onClick="App.enableTransferProperty();" class="btn btn-primary"> Transfer Property </button>
+
+            <button type="button" onClick="App.enableSearchProperty();" class="btn btn-primary"> Search Property </button>
           </center>
         </div>
 
-        <div id="fileFIRForm">
-          <form id="fForm">
+        <div id="registerUserForm">
+          <form id="rUForm">
             <table class="table">
-              <tbody id="fFIR">
+              <tbody id="rU">
               
               </tbody>
             </table>
           </form>
         </div>
 
-        <div id="displayFIRForm">
+        <div id="registerPropertyForm">
+          <form id="rPForm">
+            <table class="table">
+              <tbody id="rP">
+              
+              </tbody>
+            </table>
+          </form>
+        </div>
+
+        <div id="transferPropertyForm" >
+          <form id="tPForm">
+            <table class="table">
+              <tbody id="tP">
+              
+              </tbody>
+            </table>
+          </form>
+        </div>
+
+        <div id="displayProperty">
             <table align="center">
-              <tbody id="dFIR">
+              <tbody id="dP">
               
               </tbody>
             </table>
@@ -47,6 +72,9 @@
             <tbody id="out">
               
             </tbody>
+          </table>
+          <table class="table" id="out2">
+            
           </table>
         </div>
 

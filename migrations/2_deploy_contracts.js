@@ -1,5 +1,5 @@
-var FIR = artifacts.require("./FIR.sol");
+var propertyRegistration = artifacts.require("./PropertyRegistration.sol");
 
 module.exports = function(deployer) {
-  deployer.deploy(FIR);
+  deployer.deploy(propertyRegistration);
 };
