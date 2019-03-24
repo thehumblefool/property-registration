@@ -27,15 +27,15 @@ $ npm install
 ```
 $ truffle migrate --reset 
 ```
-  You must migrate the smart contract each time your restart ganache.
+   You must migrate the smart contract each time your restart ganache.
 
 - ##### Step 5. Configure Metamask
-  Unlock Metamask
-  Connect metamask to your local Etherum blockchain provided by Ganache.
-  Import an account provided by ganache by copying the private key from ganache and pasting it in meta mask extension.
+  - Unlock Metamask
+  - Connect metamask to your local Etherum blockchain provided by Ganache.
+  - Import an account provided by ganache by copying the private key from ganache and pasting it in meta mask extension.
 
 - ##### Step 6. Run the Front End Application
 ```
 $ npm run dev
 ```
-  Visit this URL in your browser: http://localhost:3000
+   Visit this URL in your browser: http://localhost:3000
